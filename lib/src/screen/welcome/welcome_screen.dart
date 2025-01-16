@@ -76,7 +76,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       child: Text(
                         'Démarrer',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
