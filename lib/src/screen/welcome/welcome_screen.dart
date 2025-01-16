@@ -1,11 +1,23 @@
 import 'package:anonymous/src/screen/auth/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Importez ce package pour SystemUiOverlayStyle
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Configurez la barre de statut pour qu'elle soit transparente
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Barre de statut transparente
+        statusBarIconBrightness:
+            Brightness.light, // Icônes claires (pour un fond sombre)
+      ),
+    );
+
     return Scaffold(
+      extendBodyBehindAppBar:
+          true, // Étend le contenu derrière la barre de statut
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -17,41 +29,47 @@ class WelcomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo texte "NGL" avec une police jolie
-              Text(
-                "NGL",
-                style: TextStyle(
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Pacifico', // Utilisez une police personnalisée
-                  color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: Text(
+                  "Anonymous",
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Pacifico', // Utilisez une police personnalisée
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              SizedBox(height: 20), // Espacement
-              // Bouton "Démarrer" en bas
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    ElevatedButton(
+            ),
+            // Bouton "Démarrer" et texte de consentement en bas
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity, // Occupe 100% de la largeur
+                    child: ElevatedButton(
                       onPressed: () async {
                         // Marquer que l'application a déjà été lancée
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
                         await prefs.setBool('firstLaunch', false);
 
                         // Naviguer vers la page de connexion
                         Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white, // Couleur du bouton
-                        foregroundColor: Colors.blue.shade800, // Couleur du texte
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        foregroundColor:
+                            Colors.blue.shade800, // Couleur du texte
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -61,21 +79,21 @@ class WelcomeScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(height: 10), // Espacement
-                    // Texte de consentement
-                    Text(
-                      'En continuant, vous acceptez nos conditions d\'utilisation.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                  ),
+                  SizedBox(height: 10), // Espacement
+                  // Texte de consentement
+                  Text(
+                    'En continuant, vous acceptez notre Conditions d\'utilisation et vous avez lu et approuvé nos Politique de Confidentialité.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
