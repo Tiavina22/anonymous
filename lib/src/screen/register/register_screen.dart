@@ -1,3 +1,4 @@
+import 'package:anonymous/core/config/config.dart';
 import 'package:anonymous/src/screen/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -15,11 +16,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _birthYearController = TextEditingController();
   final TextEditingController _profilePictureController =
       TextEditingController();
-  String _usageMode = 'instagram'; // Par défaut
+  String _usageMode = 'instagram';
 
   Future<void> register() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.61:5000/register'),
+      Uri.parse(Config.apiUrl),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'username': _usernameController.text,
