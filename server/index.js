@@ -30,13 +30,14 @@ const SECRET_KEY = 'ejejhfejhfehjef';
 
 // Inscription
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, birthMonth, birthYear, usageMode, profilePicture } = req.body;
   const passwordHash = await bcrypt.hash(password, 10);
   const linkToken = uuidv4(); // Génère un token unique
+
   try {
     const result = await pool.query(
-      'INSERT INTO users (username, password_hash, link_token) VALUES ($1, $2, $3) RETURNING *',
-      [username, passwordHash, linkToken]
+      'INSERT INTO users (username, password_hash, link_token, birth_month, birth_year, usage_mode, profile_picture) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [username, passwordHash, linkToken, birthMonth, birthYear, usageMode, profilePicture]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -44,6 +45,7 @@ app.post('/register', async (req, res) => {
     res.status(500).send('Erreur serveur');
   }
 });
+
 
 // Connexion
 app.post('/login', async (req, res) => {
