@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   http: ^1.2.2
   share_plus: ^10.1.4
+  shared_preferences: ^2.3.5
   web_socket_channel: ^3.0.1
 
 dev_dependencies:
@@ -20,3 +21,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/Pacifico-Regular.ttf
