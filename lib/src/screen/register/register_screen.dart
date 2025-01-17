@@ -13,6 +13,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
 
+  // Variable d'état pour gérer la visibilité du mot de passe
+  bool _obscureText = true;
+
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _birthMonthController = TextEditingController();
@@ -348,7 +351,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Étape 4 : Mot de passe
+// Étape 4 : Mot de passe
   Widget _buildStep4() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -359,10 +362,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 20),
-          TextField(
-            controller: _passwordController,
-            decoration: InputDecoration(labelText: 'Mot de passe'),
-            obscureText: true,
+          Container(
+            margin:
+                const EdgeInsets.only(left: 26, right: 26), // Marge horizontale
+            decoration: BoxDecoration(
+              color: Colors.grey[200], // Couleur de fond
+              borderRadius: BorderRadius.circular(50), // Bord arrondi
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8, horizontal: 16), // Espacement interne
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: _obscureText, // Masquer ou afficher le texte
+                      decoration: InputDecoration(
+                        border:
+                            InputBorder.none, // Supprime la bordure par défaut
+                        hintText: 'Mot de passe', // Texte d'indication
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                      ),
+                      style: TextStyle(fontSize: 18), // Style du texte saisi
+                    ),
+                  ),
+                  SizedBox(
+                      width: 8), // Espace entre le champ de texte et l'icône
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _obscureText =
+                            !_obscureText; // Basculer entre masquer/afficher
+                      });
+                    },
+                    child: Icon(
+                      _obscureText
+                          ? Icons.visibility_off
+                          : Icons.visibility, // Changer l'icône
+                      color: Colors.grey[600], // Couleur de l'icône
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
