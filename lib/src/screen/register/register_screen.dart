@@ -134,27 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'Confirmez votre âge',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 20),
-          // Afficher l'âge calculé avec un bouton pour le mettre à jour
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Âge : $_age ans',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(width: 10), // Espace entre le texte et le bouton
-              IconButton(
-                icon: Icon(Icons.refresh), // Icône de rafraîchissement
-                onPressed: () {
-                  setState(() {
-                    _calculateAge(); // Recalculer l'âge
-                  });
-                },
-                tooltip: 'Mettre à jour l\'âge', // Info-bulle
-              ),
-            ],
-          ),
+
           SizedBox(height: 20),
           // Mois et année côte à côte avec un arrière-plan commun pour l'élément central
           Padding(
@@ -249,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     color: year ==
                                             int.tryParse(
                                                 _birthYearController.text)
-                                        ? const Color.fromARGB(255, 0, 0, 0)
+                                        ? Colors.blue
                                         : Colors.black,
                                   ),
                                 ),
@@ -264,6 +244,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ],
             ),
+          ),
+          SizedBox(height: 20),
+          // Afficher l'âge calculé avec un bouton pour le mettre à jour
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Âge : $_age ans',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10), // Espace entre le texte et le bouton
+              IconButton(
+                icon: Icon(Icons.refresh), // Icône de rafraîchissement
+                onPressed: () {
+                  setState(() {
+                    _calculateAge(); // Recalculer l'âge
+                  });
+                },
+                tooltip: 'Mettre à jour l\'âge', // Info-bulle
+              ),
+            ],
           ),
         ],
       ),
@@ -301,7 +302,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Étape 3 : Choisis un nom d'utilisateur
+// Étape 3 : Choisis un nom d'utilisateur
   Widget _buildStep3() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -312,9 +313,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 20),
-          TextField(
-            controller: _usernameController,
-            decoration: InputDecoration(labelText: 'Nom d\'utilisateur'),
+          Container(
+            margin: const EdgeInsets.only(left: 26, right: 26),
+            decoration: BoxDecoration(
+              color: Colors.grey[200], // Couleur de fond
+              borderRadius: BorderRadius.circular(50), // Bord arrondi
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8, horizontal: 16), // Espacement interne
+              child: TextField(
+                controller: _usernameController,
+                textAlign: TextAlign.center, // Centrer le texte saisi
+                decoration: InputDecoration(
+                  border: InputBorder.none, // Supprime la bordure par défaut
+                  hintText: '#nom_utilisateur', // Texte d'indication
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                ),
+                style: TextStyle(fontSize: 18), // Style du texte saisi
+                onChanged: (value) {
+                  // Empêcher la suppression du #
+                  if (!value.startsWith('#')) {
+                    _usernameController.text = '#$value';
+                    _usernameController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: _usernameController.text.length),
+                    );
+                  }
+                },
+              ),
+            ),
           ),
         ],
       ),
