@@ -21,23 +21,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController();
   String _usageMode = 'instagram';
 
-  // Liste des étapes
-  final List<Widget> _steps = [];
+  // Variable pour stocker l'âge
+  int _age = 0;
 
   @override
   void initState() {
     super.initState();
-    _steps.addAll([
+
+    // Initialiser les valeurs par défaut
+    _birthMonthController.text = '6'; // Juin
+    _birthYearController.text = '2001'; // 2001
+    _calculateAge(); // Calculer l'âge initial
+  }
+
+  // Méthode pour calculer l'âge
+  void _calculateAge() {
+    final int birthMonth =
+        int.tryParse(_birthMonthController.text) ?? DateTime.now().month;
+    final int birthYear =
+        int.tryParse(_birthYearController.text) ?? DateTime.now().year;
+
+    final DateTime now = DateTime.now();
+    int age = now.year - birthYear;
+    if (now.month < birthMonth || (now.month == birthMonth && now.day < 1)) {
+      age--; // Si l'anniversaire n'est pas encore passé cette année
+    }
+
+    setState(() {
+      _age = age;
+    });
+
+    print('Âge : $_age');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> steps = [
       _buildStep1(), // Étape 1 : Confirmez votre âge
       _buildStep2(), // Étape 2 : Choix du mode d'utilisation
       _buildStep3(), // Étape 3 : Choisis un nom d'utilisateur
       _buildStep4(), // Étape 4 : Mot de passe
       _buildStep5(), // Étape 5 : Photo de profil
-    ]);
-  }
+    ];
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Inscription')),
       body: Column(
@@ -47,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: PageView(
               controller: _pageController,
               physics: NeverScrollableScrollPhysics(), // Désactive le swipe
-              children: _steps,
+              children: steps,
             ),
           ),
           // Boutons de navigation
@@ -61,12 +87,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: _goToPreviousPage,
                     child: Text('Retour'),
                   ),
-                if (_currentPage < _steps.length - 1)
+                if (_currentPage < steps.length - 1)
                   ElevatedButton(
                     onPressed: _goToNextPage,
                     child: Text('Suivant'),
                   ),
-                if (_currentPage == _steps.length - 1)
+                if (_currentPage == steps.length - 1)
                   ElevatedButton(
                     onPressed: _register,
                     child: Text('S\'inscrire'),
@@ -79,8 +105,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Étape 1 : Confirmez votre âge
   Widget _buildStep1() {
+    // Liste des mois
+    final List<String> months = [
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre'
+    ];
+
+    // Liste des années (de 1950 à 2011)
+    final List<int> years =
+        List.generate(62, (index) => 1950 + index).reversed.toList();
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -90,15 +135,135 @@ class _RegisterScreenState extends State<RegisterScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 20),
-          TextField(
-            controller: _birthMonthController,
-            decoration: InputDecoration(labelText: 'Mois de naissance'),
-            keyboardType: TextInputType.number,
+          // Afficher l'âge calculé avec un bouton pour le mettre à jour
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Âge : $_age ans',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: 10), // Espace entre le texte et le bouton
+              IconButton(
+                icon: Icon(Icons.refresh), // Icône de rafraîchissement
+                onPressed: () {
+                  setState(() {
+                    _calculateAge(); // Recalculer l'âge
+                  });
+                },
+                tooltip: 'Mettre à jour l\'âge', // Info-bulle
+              ),
+            ],
           ),
-          TextField(
-            controller: _birthYearController,
-            decoration: InputDecoration(labelText: 'Année de naissance'),
-            keyboardType: TextInputType.number,
+          SizedBox(height: 20),
+          // Mois et année côte à côte avec un arrière-plan commun pour l'élément central
+          Padding(
+            padding: EdgeInsets.only(left: 18, right: 18),
+            child: Stack(
+              children: [
+                // Arrière-plan pour l'élément central
+                Positioned(
+                  top:
+                      75, // Ajustez cette valeur pour aligner avec l'élément central
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 50, // Hauteur de l'élément central
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 204, 204, 204)
+                          .withOpacity(0.2), // Couleur de fond
+                      borderRadius: BorderRadius.circular(50), // Bord arrondi
+                    ),
+                  ),
+                ),
+                // Mois et année côte à côte
+                Row(
+                  children: [
+                    // Mois de naissance
+                    Expanded(
+                      child: SizedBox(
+                        height: 200, // Hauteur fixe pour le ListWheelScrollView
+                        child: ListWheelScrollView.useDelegate(
+                          itemExtent: 50, // Hauteur de chaque élément
+                          diameterRatio:
+                              1.5, // Ajuster la courbure du défilement
+                          magnification: 1.5, // Zoom sur l'élément au centre
+                          useMagnifier: true, // Activer le zoom
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              _birthMonthController.text = (index + 1)
+                                  .toString(); // Janvier = 1, Décembre = 12
+                              _calculateAge(); // Recalculer l'âge
+                            });
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            builder: (context, index) {
+                              final month = months[index];
+                              return Center(
+                                child: Text(
+                                  month,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: month ==
+                                            months[int.tryParse(
+                                                    _birthMonthController
+                                                        .text)! -
+                                                1]
+                                        ? Colors.blue
+                                        : Colors.black,
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: months.length,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16), // Espace entre les deux champs
+                    // Année de naissance
+                    Expanded(
+                      child: SizedBox(
+                        height: 200, // Hauteur fixe pour le ListWheelScrollView
+                        child: ListWheelScrollView.useDelegate(
+                          itemExtent: 50, // Hauteur de chaque élément
+                          diameterRatio:
+                              1.5, // Ajuster la courbure du défilement
+                          magnification: 1.5, // Zoom sur l'élément au centre
+                          useMagnifier: true, // Activer le zoom
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              _birthYearController.text =
+                                  years[index].toString();
+                              _calculateAge(); // Recalculer l'âge
+                            });
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            builder: (context, index) {
+                              final year = years[index];
+                              return Center(
+                                child: Text(
+                                  year.toString(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: year ==
+                                            int.tryParse(
+                                                _birthYearController.text)
+                                        ? const Color.fromARGB(255, 0, 0, 0)
+                                        : Colors.black,
+                                  ),
+                                ),
+                              );
+                            },
+                            childCount: years.length,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -212,7 +377,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // Aller à la page suivante
   void _goToNextPage() {
-    if (_currentPage < _steps.length - 1) {
+    if (_currentPage < 4) {
+      // 4 est le nombre d'étapes - 1
       setState(() {
         _currentPage++;
       });
